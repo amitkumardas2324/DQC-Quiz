@@ -1,4 +1,499 @@
-const Q=[{"round": "ROUND 1 — Emoji Decode: Hard Mode", "time": 20, "question": "🧠💡📦➡️🚪\nWhat phrase is this trying to represent?", "options": ["Think outside the box", "Brain drain", "Light at the end of the tunnel", "Open-minded thinking"], "answer": 0, "points": 100}, {"round": "ROUND 1 — Emoji Decode: Hard Mode", "time": 20, "question": "📊🔎❌➡️📝➡️✅\nWhat DQC activity does this best represent?", "options": ["Data entry", "Data review & issue resolution", "Data visualization", "Report generation"], "answer": 1, "points": 100}, {"round": "ROUND 1 — Emoji Decode: Hard Mode", "time": 20, "question": "📄1️⃣➡️📄2️⃣➡️📄3️⃣➡️📄❓\nWhat is the biggest concern here? 😄", "options": ["File size", "Version control", "Font formatting", "Page numbering"], "answer": 1, "points": 100}, {"round": "ROUND 1 — Emoji Decode: Hard Mode", "time": 20, "question": "🎤💻😶➡️👤😳➡️🔊\nWhat classic Teams moment is this?", "options": ["Poor internet", "Wrong meeting", "Speaking while muted", "Screen-sharing failure"], "answer": 2, "points": 100}, {"round": "ROUND 1 — Emoji Decode: Hard Mode", "time": 20, "question": "🔍📊➡️❓➡️📑➡️🤔➡️📧\nWhat does this most closely resemble?", "options": ["DQC investigation", "Marketing campaign", "Recruitment", "Team celebration"], "answer": 0, "points": 100}, {"round": "ROUND 1 — Emoji Decode: Hard Mode", "time": 20, "question": "🧪➡️📊➡️🔍➡️⚠️➡️📝➡️🔧➡️✅\nWhat does this most closely represent?", "options": ["CAPA", "Recruitment", "Product launch", "Budget planning"], "answer": 0, "points": 100}, {"round": "ROUND 1 — Emoji Decode: Hard Mode", "time": 20, "question": "📄➡️📝➡️📄➡️📝➡️📄➡️📝➡️♾️", "options": ["Document control", "Version control", "Continuous improvement", "The \"final_final_v7\" phenomenon 😂"], "answer": 3, "points": 100}, {"round": "ROUND 1 — Emoji Decode: Hard Mode", "time": 20, "question": "📅➡️📅➡️📅➡️📅➡️📅➡️🚨➡️🏃", "options": ["Long-term planning", "Deadline approaching", "Holiday planning", "Business expansion"], "answer": 1, "points": 100}, {"round": "ROUND 1 — Emoji Decode: Hard Mode", "time": 20, "question": "📧➡️“FYI”➡️📧➡️“Gentle reminder”➡️📧➡️“Second reminder”➡️😶", "options": ["Communication strategy", "Email escalation", "Corporate patience test 😂", "Project closure"], "answer": 2, "points": 100}, {"round": "ROUND 1 — Emoji Decode: Hard Mode", "time": 20, "question": "🧊➡️🔥➡️🧯➡️😎", "options": ["Risk mitigation", "Firefighting", "Crisis management", "All of the above"], "answer": 3, "points": 100}, {"round": "ROUND 2 — FASTEST FINGER", "time": 5, "question": "What comes next?\n2, 6, 12, 20, 30, ?", "options": ["36", "40", "42", "44"], "answer": 2, "points": 100}, {"round": "ROUND 2 — FASTEST FINGER", "time": 5, "question": "If 5 machines produce 5 units in 5 minutes, how long will 100 machines take to produce 100 units?", "options": ["5 minutes", "20 minutes", "100 minutes", "500 minutes"], "answer": 0, "points": 100}, {"round": "ROUND 2 — FASTEST FINGER", "time": 5, "question": "A meeting starts at 9:45 AM and lasts 1 hour 35 minutes. When does it finish?", "options": ["11:10 AM", "11:15 AM", "11:20 AM", "11:30 AM"], "answer": 2, "points": 100}, {"round": "ROUND 2 — FASTEST FINGER", "time": 5, "question": "DATA CHECK\nA file has 250 records. 8% have issues. How many records have issues?", "options": ["15", "20", "25", "30"], "answer": 1, "points": 100}, {"round": "ROUND 2 — FASTEST FINGER", "time": 5, "question": "DEADLINE PRESSURE 😂\nYou have 4 tasks, each taking 15 minutes. You start at 2:10 PM. When will you finish?", "options": ["2:55 PM", "3:10 PM", "3:15 PM", "3:20 PM"], "answer": 1, "points": 100}, {"round": "ROUND 2 — FASTEST FINGER", "time": 5, "question": "EMAIL MATH 📧\nYou receive 24 emails. You reply to ¼ of them. How many are left?", "options": ["6", "12", "18", "20"], "answer": 2, "points": 100}, {"round": "ROUND 2 — FASTEST FINGER", "time": 5, "question": "A reviewer checks 4 files. Each has 3 issues. After correcting 5 issues, how many remain?", "options": ["5", "7", "8", "9"], "answer": 1, "points": 100}, {"round": "ROUND 2 — FASTEST FINGER", "time": 5, "question": "A file is named:\nFINAL_v5_FINAL_UPDATED_LATEST.xlsx\nHow many versions are explicitly indicated?", "options": ["3", "4", "5", "Impossible to determine"], "answer": 3, "points": 100}, {"round": "ROUND 2 — FASTEST FINGER", "time": 5, "question": "You overtake the person in 2nd place. What position are you now?", "options": ["1st", "2nd", "3rd", "Depends on the race"], "answer": 1, "points": 100}, {"round": "ROUND 2 — FASTEST FINGER", "time": 5, "question": "A doctor tells you to take 3 tablets, one every 30 minutes. How long until you've taken all three?", "options": ["30 minutes", "60 minutes", "90 minutes", "120 minutes"], "answer": 1, "points": 100}, {"round": "ROUND 3 — ODD ONE OUT", "time": 10, "question": "", "options": ["Accuracy", "Completeness", "Consistency", "Traceability"], "answer": 3, "points": 100}, {"round": "ROUND 3 — ODD ONE OUT", "time": 10, "question": "", "options": ["Attributable", "Legible", "Original", "Available"], "answer": 3, "points": 100}, {"round": "ROUND 3 — ODD ONE OUT", "time": 10, "question": "", "options": ["Excel", "Power BI", "Tableau", "SharePoint"], "answer": 3, "points": 100}, {"round": "ROUND 3 — ODD ONE OUT", "time": 10, "question": "", "options": ["SOP", "Work Instruction", "Policy", "Dashboard"], "answer": 3, "points": 100}, {"round": "ROUND 3 — ODD ONE OUT", "time": 10, "question": "", "options": ["Reviewer", "Approver", "Author", "Stakeholder"], "answer": 3, "points": 100}, {"round": "ROUND 4 — DQC LIFE: SITUATION CHALLENGE", "time": 10, "question": "You receive:\nFINAL_v2_FINAL_LATEST_NEW_UPDATED.xlsx\nWhat's your first thought?", "options": ["“Perfect, this is final.”", "“Which version is actually final?”", "“Let's rename it FINAL_v3.”", "“I'll use all of them.”"], "answer": 1, "points": 100}, {"round": "ROUND 4 — DQC LIFE: SITUATION CHALLENGE", "time": 10, "question": "Your manager says: “This will only take 5 minutes.” What happens next? 😂", "options": ["Meeting ends in 5 minutes", "Meeting ends in 10 minutes", "Someone raises another question", "A new meeting gets scheduled"], "answer": 2, "points": 100}, {"round": "ROUND 4 — DQC LIFE: SITUATION CHALLENGE", "time": 10, "question": "Someone asks, “Do we have evidence for this?” Your DQC instinct is:", "options": ["“I think so.”", "“Probably.”", "“Let me check the documentation.”", "“Trust me.”"], "answer": 2, "points": 100}, {"round": "ROUND 4 — DQC LIFE: SITUATION CHALLENGE", "time": 10, "question": "It's 4:59 PM on Friday and you receive: “Small urgent request.” Your reaction?", "options": ["😍 Excited", "😐 Normal", "😭 Why me?", "🏃 Run away"], "answer": 2, "points": 100}, {"round": "ROUND 4 — DQC LIFE: SITUATION CHALLENGE", "time": 10, "question": "“It’s Just One Cell” 😈\nYour colleague says: “Don't worry, I changed only ONE cell.” What should your DQC brain immediately say?", "options": ["“Great, less work!”", "“One cell can't cause problems.”", "“What changed, why, and what is the impact?”", "“Let's change two more.” 😂"], "answer": 2, "points": 100}, {"round": "ROUND 5 — PHARMA + QUALITY + GENERAL KNOWLEDGE", "time": 10, "question": "What does ALCOA+ primarily relate to?", "options": ["Financial reporting", "Data integrity", "Drug pricing", "Supply-chain planning"], "answer": 1, "points": 100}, {"round": "ROUND 5 — PHARMA + QUALITY + GENERAL KNOWLEDGE", "time": 10, "question": "Which of the following is NOT part of the commonly used ALCOA principles?", "options": ["Attributable", "Legible", "Original", "Profitable"], "answer": 3, "points": 100}, {"round": "ROUND 5 — PHARMA + QUALITY + GENERAL KNOWLEDGE", "time": 10, "question": "In a quality environment, CAPA commonly stands for:", "options": ["Corrective and Preventive Action", "Controlled Analysis & Process Assessment", "Corrective Analysis & Product Approval", "Compliance Assessment & Process Audit"], "answer": 0, "points": 100}, {"round": "ROUND 5 — PHARMA + QUALITY + GENERAL KNOWLEDGE", "time": 10, "question": "Which organization regulates medicines in the United States?", "options": ["WHO", "EMA", "FDA", "ICH"], "answer": 2, "points": 100}, {"round": "ROUND 5 — PHARMA + QUALITY + GENERAL KNOWLEDGE", "time": 10, "question": "Which sentence is most likely to make a DQC person nervous?", "options": ["“Everything is complete.”", "“Please find the attached report.”", "“I made one tiny change; no need to review again.”", "“The meeting is cancelled.”"], "answer": 2, "points": 100}];let ws,answered=false;
-function join(){let n=document.getElementById('name').value.trim(),r=document.getElementById('room').value.trim().toUpperCase();if(!n||!r)return alert('Enter name and room code');document.getElementById('join').classList.add('hidden');document.getElementById('lobby').classList.remove('hidden');document.getElementById('welcome').textContent='Welcome, '+n;let p=location.protocol==='https:'?'wss':'ws';ws=new WebSocket(p+'://'+location.host+'/ws?room='+encodeURIComponent(r)+'&id='+crypto.randomUUID()+'&name='+encodeURIComponent(n));ws.onmessage=e=>msg(JSON.parse(e.data));}
-function msg(m){if(m.type==='question'){answered=false;document.getElementById('lobby').classList.add('hidden');document.getElementById('game').classList.remove('hidden');document.getElementById('round').textContent=m.round+' • '+m.points+' points';document.getElementById('q').innerText=m.question;document.getElementById('opts').innerHTML=m.options.map((x,i)=>'<button class=option onclick="ans('+i+')">'+String.fromCharCode(65+i)+'. '+x+'</button>').join('');}if(m.type==='tick')document.getElementById('timer').textContent=m.seconds;if(m.type==='locked')document.querySelectorAll('.option').forEach(x=>x.disabled=true);if(m.type==='result'){document.getElementById('status').textContent=m.correct?'✅ Correct! +'+m.points:'❌ Incorrect';document.getElementById('score').textContent='Score: '+m.score}if(m.type==='end'){document.getElementById('game').classList.add('hidden');document.getElementById('end').classList.remove('hidden');document.getElementById('final').innerHTML=m.items.map((x,i)=>'<p>'+(i+1)+'. <b>'+x.name+'</b> — '+x.score+'</p>').join('')}}
-function ans(i){if(answered)return;answered=true;ws.send(JSON.stringify({type:'answer',answer:i}));document.querySelectorAll('.option').forEach(x=>x.disabled=true)}
+let ws = null;
+let playerId = null;
+let room = null;
+let playerName = null;
+
+const $ = id =>
+  document.getElementById(id);
+
+
+// =========================
+// JOIN QUIZ
+// =========================
+
+function joinQuiz() {
+
+  playerName =
+    $('name').value.trim();
+
+  room =
+    $('room').value.trim().toUpperCase();
+
+  if (!playerName) {
+    alert('Please enter your name.');
+    return;
+  }
+
+  if (!room) {
+    alert('Please enter the room code.');
+    return;
+  }
+
+  playerId =
+    Math.random()
+      .toString(36)
+      .slice(2, 10);
+
+  const protocol =
+    location.protocol === 'https:'
+      ? 'wss:'
+      : 'ws:';
+
+  const wsUrl =
+    protocol +
+    '//' +
+    location.host +
+    '/ws?room=' +
+    encodeURIComponent(room) +
+    '&id=' +
+    encodeURIComponent(playerId) +
+    '&name=' +
+    encodeURIComponent(playerName);
+
+  ws = new WebSocket(wsUrl);
+
+  ws.onopen = () => {
+
+    $('joinScreen').style.display =
+      'none';
+
+    $('quizScreen').style.display =
+      'block';
+
+    if ($('playerName')) {
+      $('playerName').textContent =
+        playerName;
+    }
+
+    if ($('roomDisplay')) {
+      $('roomDisplay').textContent =
+        room;
+    }
+  };
+
+  ws.onclose = () => {
+
+    alert(
+      'Connection closed. Please refresh and join again.'
+    );
+  };
+
+  ws.onmessage = event => {
+
+    const message =
+      JSON.parse(event.data);
+
+    handleMessage(message);
+  };
+}
+
+
+// =========================
+// SERVER MESSAGES
+// =========================
+
+function handleMessage(message) {
+
+  // PARTICIPANT STATE
+  if (message.type === 'state') {
+
+    if ($('participantCount')) {
+
+      $('participantCount').textContent =
+        message.players;
+    }
+  }
+
+
+  // NEW QUESTION
+  if (message.type === 'question') {
+
+    closeLeaderboard();
+
+    showQuestion(message);
+  }
+
+
+  // TIMER
+  if (message.type === 'tick') {
+
+    updateTimer(
+      message.seconds
+    );
+  }
+
+
+  // QUESTION LOCKED
+  if (message.type === 'locked') {
+
+    lockQuestion();
+
+    updateTimer(0);
+  }
+
+
+  // ANSWER RESULT
+  if (message.type === 'result') {
+
+    showResult(message);
+  }
+
+
+  // LEADERBOARD
+  if (message.type === 'leaderboard') {
+
+    showLeaderboard(
+      message.items
+    );
+  }
+}
+
+
+// =========================
+// SHOW QUESTION
+// =========================
+
+function showQuestion(message) {
+
+  if ($('question')) {
+
+    $('question').textContent =
+      message.question;
+  }
+
+  if ($('round')) {
+
+    $('round').textContent =
+      'Round ' + message.round;
+  }
+
+  const options =
+    $('options');
+
+  if (!options) {
+    return;
+  }
+
+  options.innerHTML = '';
+
+  message.options.forEach(
+    (option, index) => {
+
+      const button =
+        document.createElement(
+          'button'
+        );
+
+      button.className =
+        'answer-button';
+
+      button.textContent =
+        String.fromCharCode(
+          65 + index
+        ) +
+        '. ' +
+        option;
+
+      button.onclick = () => {
+
+        submitAnswer(
+          index
+        );
+      };
+
+      options.appendChild(
+        button
+      );
+    }
+  );
+}
+
+
+// =========================
+// SUBMIT ANSWER
+// =========================
+
+function submitAnswer(answer) {
+
+  if (
+    !ws ||
+    ws.readyState !==
+    WebSocket.OPEN
+  ) {
+    return;
+  }
+
+  const buttons =
+    document.querySelectorAll(
+      '.answer-button'
+    );
+
+  buttons.forEach(button => {
+    button.disabled = true;
+  });
+
+  ws.send(JSON.stringify({
+    type: 'answer',
+    answer: answer
+  }));
+}
+
+
+// =========================
+// TIMER
+// =========================
+
+function updateTimer(seconds) {
+
+  const timer =
+    $('timer');
+
+  if (!timer) {
+    return;
+  }
+
+  timer.textContent =
+    seconds;
+
+  if (seconds <= 5) {
+
+    timer.classList.add(
+      'danger'
+    );
+
+  } else {
+
+    timer.classList.remove(
+      'danger'
+    );
+  }
+}
+
+
+// =========================
+// LOCK QUESTION
+// =========================
+
+function lockQuestion() {
+
+  const buttons =
+    document.querySelectorAll(
+      '.answer-button'
+    );
+
+  buttons.forEach(button => {
+    button.disabled = true;
+  });
+}
+
+
+// =========================
+// ANSWER RESULT
+// =========================
+
+function showResult(message) {
+
+  const result =
+    $('result');
+
+  if (!result) {
+    return;
+  }
+
+  if (message.correct) {
+
+    result.textContent =
+      '✅ Correct! +100 points';
+
+    result.className =
+      'result correct';
+
+  } else {
+
+    result.textContent =
+      '❌ Incorrect! +0 points';
+
+    result.className =
+      'result wrong';
+  }
+
+  result.style.display =
+    'block';
+
+  if ($('score')) {
+
+    $('score').textContent =
+      message.score;
+  }
+}
+
+
+// =========================
+// LEADERBOARD
+// =========================
+
+function showLeaderboard(items) {
+
+  closeLeaderboard();
+
+  const overlay =
+    document.createElement(
+      'div'
+    );
+
+  overlay.id =
+    'leaderboardOverlay';
+
+  overlay.className =
+    'leaderboard-overlay';
+
+  let rows = '';
+
+  items.forEach(
+    (player, index) => {
+
+      const position =
+        index + 1;
+
+      let medal = '';
+
+      if (position === 1) {
+        medal = '🥇';
+      } else if (position === 2) {
+        medal = '🥈';
+      } else if (position === 3) {
+        medal = '🥉';
+      } else {
+        medal = position;
+      }
+
+      const isMe =
+        player.id === playerId;
+
+      rows += `
+        <div class="leaderboard-row ${
+          position <= 3
+            ? 'top-player'
+            : ''
+        } ${
+          isMe
+            ? 'my-position'
+            : ''
+        }">
+
+          <div class="rank">
+            ${medal}
+          </div>
+
+          <div class="player-name">
+            ${escapeHtml(player.name)}
+            ${
+              isMe
+                ? '<span class="you-label">YOU</span>'
+                : ''
+            }
+          </div>
+
+          <div class="player-score">
+            ${player.score}
+          </div>
+
+        </div>
+      `;
+    }
+  );
+
+  if (items.length === 0) {
+
+    rows = `
+      <div class="empty-board">
+        No participants yet
+      </div>
+    `;
+  }
+
+  overlay.innerHTML = `
+    <div class="leaderboard-card">
+
+      <div class="leaderboard-header">
+
+        <div>
+          <div class="leaderboard-title">
+            🏆 LEADERBOARD
+          </div>
+
+          <div class="leaderboard-subtitle">
+            Current scores
+          </div>
+        </div>
+
+        <button
+          class="leaderboard-close"
+          onclick="closeLeaderboard()">
+          ✕
+        </button>
+
+      </div>
+
+      <div class="leaderboard-columns">
+        <div>RANK</div>
+        <div>PARTICIPANT</div>
+        <div>SCORE</div>
+      </div>
+
+      <div class="leaderboard-list">
+        ${rows}
+      </div>
+
+    </div>
+  `;
+
+  document.body.appendChild(
+    overlay
+  );
+}
+
+
+function closeLeaderboard() {
+
+  const overlay =
+    document.getElementById(
+      'leaderboardOverlay'
+    );
+
+  if (overlay) {
+    overlay.remove();
+  }
+}
+
+
+// =========================
+// SECURITY
+// =========================
+
+function escapeHtml(value) {
+
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+
+// =========================
+// BUTTON
+// =========================
+
+document.addEventListener(
+  'DOMContentLoaded',
+  () => {
+
+    if ($('joinButton')) {
+
+      $('joinButton').onclick =
+        joinQuiz;
+    }
+  }
+);
