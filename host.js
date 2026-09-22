@@ -11,25 +11,46 @@ function createRoom() {
     .slice(2, 7)
     .toUpperCase();
 
-  $('room').textContent = 'Room: ' + room;
+  // Show room code
+  const roomElement = $('room');
 
+  if (roomElement) {
+    roomElement.textContent = 'Room: ' + room;
+  }
+
+  // Create participant URL
   const joinUrl =
     location.origin + '/?room=' + room;
 
-  $('joinurl').textContent = joinUrl;
+  const joinUrlElement = $('joinurl');
 
+  if (joinUrlElement) {
+    joinUrlElement.textContent = joinUrl;
+  }
+
+  // Create QR code
   const qrUrl =
     'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' +
     encodeURIComponent(joinUrl);
 
-  $('qr').src = qrUrl;
+  const qrElement = $('qr');
 
+  if (qrElement) {
+    qrElement.src = qrUrl;
+    qrElement.style.display = 'block';
+  }
+
+  // Connect host
   connectHost();
 }
 
+
 function connectHost() {
 
-  if (ws && ws.readyState === WebSocket.OPEN) {
+  if (
+    ws &&
+    ws.readyState === WebSocket.OPEN
+  ) {
     return;
   }
 
@@ -43,50 +64,87 @@ function connectHost() {
     '//' +
     location.host +
     '/ws?room=' +
-    room +
+    encodeURIComponent(room) +
     '&id=HOST'
   );
 
   ws.onopen = () => {
 
-    $('status').textContent =
-      'Host connected';
+    const status = $('status');
 
-    $('start').disabled = false;
-    $('next').disabled = false;
-    $('prev').disabled = false;
-    $('pause').disabled = false;
-    $('board').disabled = false;
+    if (status) {
+      status.textContent =
+        'Host connected';
+    }
+
+    enableButton('start');
+    enableButton('next');
+    enableButton('prev');
+    enableButton('pause');
+    enableButton('board');
   };
 
   ws.onclose = () => {
 
-    $('status').textContent =
-      'Host disconnected';
+    const status = $('status');
+
+    if (status) {
+      status.textContent =
+        'Host disconnected';
+    }
+  };
+
+  ws.onerror = error => {
+
+    console.error(
+      'WebSocket error:',
+      error
+    );
   };
 
   ws.onmessage = event => {
 
-    const message =
-      JSON.parse(event.data);
+    let message;
+
+    try {
+      message =
+        JSON.parse(event.data);
+    } catch (error) {
+      return;
+    }
 
     handleMessage(message);
   };
 }
 
+
+function enableButton(id) {
+
+  const button = $(id);
+
+  if (button) {
+    button.disabled = false;
+  }
+}
+
+
 function handleMessage(message) {
 
-  // PARTICIPANTS
+  // Participants
   if (message.type === 'state') {
 
-    $('count').textContent =
-      message.players;
+    const count = $('count');
 
-    const list = $('players');
+    if (count) {
+      count.textContent =
+        message.players;
+    }
 
-    if (list) {
+    const players = $('players');
 
-      list.innerHTML = '';
+    if (players) {
+
+      players.innerHTML = '';
 
       message.names.forEach(name => {
 
@@ -95,66 +153,96 @@ function handleMessage(message) {
 
         li.textContent = name;
 
-        list.appendChild(li);
+        players.appendChild(li);
       });
     }
   }
 
-  // QUESTION
+
+  // Question
   if (message.type === 'question') {
 
     idx = message.index;
 
-    $('question').textContent =
-      message.question;
+    const question = $('question');
 
-    $('round').textContent =
-      'Round ' + message.round;
+    if (question) {
+      question.textContent =
+        message.question;
+    }
 
-    $('timer').textContent =
-      message.points + ' points';
+    const round = $('round');
 
-    if ($('options')) {
+    if (round) {
+      round.textContent =
+        'Round ' + message.round;
+    }
 
-      $('options').innerHTML = '';
+    const timer = $('timer');
 
-      message.options.forEach((option, i) => {
+    if (timer) {
+      timer.textContent =
+        message.points + ' points';
 
-        const div =
-          document.createElement('div');
+      timer.classList.remove('locked');
+    }
 
-        div.className =
-          'host-option';
+    const options = $('options');
 
-        div.textContent =
-          String.fromCharCode(65 + i) +
-          '. ' +
-          option;
+    if (options) {
 
-        $('options').appendChild(div);
-      });
+      options.innerHTML = '';
+
+      message.options.forEach(
+        (option, i) => {
+
+          const div =
+            document.createElement('div');
+
+          div.className =
+            'host-option';
+
+          div.textContent =
+            String.fromCharCode(65 + i) +
+            '. ' +
+            option;
+
+          options.appendChild(div);
+        }
+      );
     }
   }
 
-  // TIMER
+
+  // Timer
   if (message.type === 'tick') {
 
-    $('timer').textContent =
-      message.seconds + ' sec';
+    const timer = $('timer');
+
+    if (timer) {
+      timer.textContent =
+        message.seconds + ' sec';
+    }
   }
 
-  // QUESTION LOCKED
+
+  // Locked
   if (message.type === 'locked') {
 
-    $('timer').textContent =
-      'LOCKED';
+    const timer = $('timer');
 
-    $('timer').classList.add(
-      'locked'
-    );
+    if (timer) {
+      timer.textContent =
+        'LOCKED';
+
+      timer.classList.add(
+        'locked'
+      );
+    }
   }
 
-  // LEADERBOARD
+
+  // Leaderboard
   if (message.type === 'leaderboard') {
 
     showLeaderboard(
@@ -163,21 +251,31 @@ function handleMessage(message) {
   }
 }
 
+
+// =============================
+// START / NEXT QUESTION
+// =============================
+
 function startQuestion() {
 
-  if (!ws || ws.readyState !== WebSocket.OPEN) {
+  if (
+    !ws ||
+    ws.readyState !== WebSocket.OPEN
+  ) {
     return;
   }
 
-  const questionIndex =
+  const nextIndex =
     idx + 1;
 
-  if (questionIndex >= 30) {
-    alert('Quiz completed!');
+  if (
+    nextIndex < 0 ||
+    nextIndex >= 30
+  ) {
     return;
   }
 
-  idx = questionIndex;
+  idx = nextIndex;
 
   ws.send(JSON.stringify({
     type: 'start',
@@ -185,9 +283,17 @@ function startQuestion() {
   }));
 }
 
+
+// =============================
+// PREVIOUS QUESTION
+// =============================
+
 function previousQuestion() {
 
-  if (!ws || ws.readyState !== WebSocket.OPEN) {
+  if (
+    !ws ||
+    ws.readyState !== WebSocket.OPEN
+  ) {
     return;
   }
 
@@ -202,9 +308,17 @@ function previousQuestion() {
   }));
 }
 
+
+// =============================
+// PAUSE
+// =============================
+
 function pauseQuestion() {
 
-  if (!ws || ws.readyState !== WebSocket.OPEN) {
+  if (
+    !ws ||
+    ws.readyState !== WebSocket.OPEN
+  ) {
     return;
   }
 
@@ -213,15 +327,39 @@ function pauseQuestion() {
   }));
 }
 
+
+// =============================
+// LEADERBOARD
+// =============================
+
+function requestLeaderboard() {
+
+  if (
+    !ws ||
+    ws.readyState !== WebSocket.OPEN
+  ) {
+    return;
+  }
+
+  ws.send(JSON.stringify({
+    type: 'leaderboard'
+  }));
+}
+
+
+// =============================
+// LEADERBOARD DISPLAY
+// =============================
+
 function showLeaderboard(items) {
 
-  const existing =
+  const old =
     document.getElementById(
       'leaderboardOverlay'
     );
 
-  if (existing) {
-    existing.remove();
+  if (old) {
+    old.remove();
   }
 
   const overlay =
@@ -235,42 +373,49 @@ function showLeaderboard(items) {
 
   let rows = '';
 
-  items.forEach((player, index) => {
+  items.forEach(
+    (player, index) => {
 
-    const position =
-      index + 1;
+      const position =
+        index + 1;
 
-    let medal = '';
+      let medal;
 
-    if (position === 1) medal = '🥇';
-    else if (position === 2) medal = '🥈';
-    else if (position === 3) medal = '🥉';
-    else medal = position;
+      if (position === 1) {
+        medal = '🥇';
+      } else if (position === 2) {
+        medal = '🥈';
+      } else if (position === 3) {
+        medal = '🥉';
+      } else {
+        medal = position;
+      }
 
-    rows += `
-      <div class="leaderboard-row ${
-        position <= 3
-          ? 'top-player'
-          : ''
-      }">
+      rows += `
+        <div class="leaderboard-row ${
+          position <= 3
+            ? 'top-player'
+            : ''
+        }">
 
-        <div class="rank">
-          ${medal}
+          <div class="rank">
+            ${medal}
+          </div>
+
+          <div class="player-name">
+            ${escapeHtml(player.name)}
+          </div>
+
+          <div class="player-score">
+            ${player.score}
+          </div>
+
         </div>
+      `;
+    }
+  );
 
-        <div class="player-name">
-          ${escapeHtml(player.name)}
-        </div>
-
-        <div class="player-score">
-          ${player.score}
-        </div>
-
-      </div>
-    `;
-  });
-
-  if (items.length === 0) {
+  if (!items.length) {
 
     rows = `
       <div class="empty-board">
@@ -296,7 +441,7 @@ function showLeaderboard(items) {
 
         <button
           class="leaderboard-close"
-          onclick="closeLeaderboard()">
+          id="closeLeaderboard">
           ✕
         </button>
 
@@ -318,7 +463,18 @@ function showLeaderboard(items) {
   document.body.appendChild(
     overlay
   );
+
+  const close =
+    document.getElementById(
+      'closeLeaderboard'
+    );
+
+  if (close) {
+    close.onclick =
+      closeLeaderboard;
+  }
 }
+
 
 function closeLeaderboard() {
 
@@ -332,6 +488,7 @@ function closeLeaderboard() {
   }
 }
 
+
 function escapeHtml(value) {
 
   return String(value)
@@ -343,52 +500,60 @@ function escapeHtml(value) {
 }
 
 
-// BUTTON CONNECTIONS
+// =============================
+// PAGE BUTTONS
+// =============================
 
 document.addEventListener(
   'DOMContentLoaded',
   () => {
 
-    if ($('create')) {
-      $('create').onclick =
+    const create =
+      $('create');
+
+    if (create) {
+      create.onclick =
         createRoom;
     }
 
-    if ($('start')) {
-      $('start').onclick =
+    const start =
+      $('start');
+
+    if (start) {
+      start.onclick =
         startQuestion;
     }
 
-    if ($('next')) {
-      $('next').onclick =
+    const next =
+      $('next');
+
+    if (next) {
+      next.onclick =
         startQuestion;
     }
 
-    if ($('prev')) {
-      $('prev').onclick =
+    const prev =
+      $('prev');
+
+    if (prev) {
+      prev.onclick =
         previousQuestion;
     }
 
-    if ($('pause')) {
-      $('pause').onclick =
+    const pause =
+      $('pause');
+
+    if (pause) {
+      pause.onclick =
         pauseQuestion;
     }
 
-    if ($('board')) {
-      $('board').onclick = () => {
+    const board =
+      $('board');
 
-        if (
-          !ws ||
-          ws.readyState !==
-          WebSocket.OPEN
-        ) {
-          return;
-        }
-
-        ws.send(JSON.stringify({
-          type: 'leaderboard'
-        }));
-      };
+    if (board) {
+      board.onclick =
+        requestLeaderboard;
     }
   }
 );
