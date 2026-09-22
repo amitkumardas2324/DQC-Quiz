@@ -131,7 +131,7 @@
   },
   {
     "round": "ROUND 2 — FASTEST FINGER",
-    "time": 5,
+    "time": 10,
     "question": "What comes next?\n2, 6, 12, 20, 30, ?",
     "options": [
       "36",
@@ -144,7 +144,7 @@
   },
   {
     "round": "ROUND 2 — FASTEST FINGER",
-    "time": 5,
+    "time": 10,
     "question": "If 5 machines produce 5 units in 5 minutes, how long will 100 machines take to produce 100 units?",
     "options": [
       "5 minutes",
@@ -157,7 +157,7 @@
   },
   {
     "round": "ROUND 2 — FASTEST FINGER",
-    "time": 5,
+    "time": 10,
     "question": "A meeting starts at 9:45 AM and lasts 1 hour 35 minutes. When does it finish?",
     "options": [
       "11:10 AM",
@@ -170,7 +170,7 @@
   },
   {
     "round": "ROUND 2 — FASTEST FINGER",
-    "time": 5,
+    "time": 10,
     "question": "DATA CHECK\nA file has 250 records. 8% have issues. How many records have issues?",
     "options": [
       "15",
@@ -183,7 +183,7 @@
   },
   {
     "round": "ROUND 2 — FASTEST FINGER",
-    "time": 5,
+    "time": 10,
     "question": "DEADLINE PRESSURE 😂\nYou have 4 tasks, each taking 15 minutes. You start at 2:10 PM. When will you finish?",
     "options": [
       "2:55 PM",
@@ -196,7 +196,7 @@
   },
   {
     "round": "ROUND 2 — FASTEST FINGER",
-    "time": 5,
+    "time": 10,
     "question": "EMAIL MATH 📧\nYou receive 24 emails. You reply to ¼ of them. How many are left?",
     "options": [
       "6",
@@ -209,7 +209,7 @@
   },
   {
     "round": "ROUND 2 — FASTEST FINGER",
-    "time": 5,
+    "time": 10,
     "question": "A reviewer checks 4 files. Each has 3 issues. After correcting 5 issues, how many remain?",
     "options": [
       "5",
@@ -222,7 +222,7 @@
   },
   {
     "round": "ROUND 2 — FASTEST FINGER",
-    "time": 5,
+    "time": 10,
     "question": "A file is named:\nFINAL_v5_FINAL_UPDATED_LATEST.xlsx\nHow many versions are explicitly indicated?",
     "options": [
       "3",
@@ -235,7 +235,7 @@
   },
   {
     "round": "ROUND 2 — FASTEST FINGER",
-    "time": 5,
+    "time": 10,
     "question": "You overtake the person in 2nd place. What position are you now?",
     "options": [
       "1st",
@@ -248,7 +248,7 @@
   },
   {
     "round": "ROUND 2 — FASTEST FINGER",
-    "time": 5,
+    "time": 10,
     "question": "A doctor tells you to take 3 tablets, one every 30 minutes. How long until you've taken all three?",
     "options": [
       "30 minutes",
