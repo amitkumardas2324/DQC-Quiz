@@ -11,19 +11,16 @@ const Q = JSON.parse(
 const rooms = new Map();
 const port = process.env.PORT || 3000;
 
-// HTTP SERVER
-const s = http.createServer((req, res) => {
+const server = http.createServer((req, res) => {
   let p = url.parse(req.url).pathname;
 
   if (p === '/') p = '/index.html';
   if (p === '/host') p = '/host.html';
 
-  const f = path.join(__dirname, p);
+  const filePath = path.join(__dirname, p);
 
-  if (!fs.existsSync(f)) {
-    res.writeHead(404, {
-      'Content-Type': 'text/plain'
-    });
+  if (!fs.existsSync(filePath)) {
+    res.writeHead(404, { 'Content-Type': 'text/plain' });
     return res.end('Not found');
   }
 
@@ -41,37 +38,55 @@ const s = http.createServer((req, res) => {
     'Content-Type': contentType + '; charset=utf-8'
   });
 
-  res.end(fs.readFileSync(f));
+  res.end(fs.readFileSync(filePath));
 });
 
-// WEBSOCKET SERVER
-const w = new WebSocket.Server({
-  server: s,
+const wss = new WebSocket.Server({
+  server: server,
   path: '/ws'
 });
 
-const send = (client, message) => {
+function send(client, message) {
   if (client && client.readyState === WebSocket.OPEN) {
     client.send(JSON.stringify(message));
   }
-};
+}
 
-const broadcast = (room, message) => {
+function broadcast(room, message) {
   send(room.host, message);
 
   for (const player of room.players.values()) {
     send(player.ws, message);
   }
-};
+}
 
-const getState = (room) => ({
-  type: 'state',
-  players: room.players.size,
-  names: [...room.players.values()].map(player => player.name)
-});
+function getState(room) {
+  return {
+    type: 'state',
+    players: room.players.size,
+    names: [...room.players.values()].map(player => player.name)
+  };
+}
 
-// CONNECTION
-w.on('connection', (ws, req) => {
+function getLeaderboard(room) {
+  const leaderboard = [...room.players].map(([playerId, player]) => ({
+    id: playerId,
+    name: player.name,
+    score: room.scores.get(playerId) || 0
+  }));
+
+  leaderboard.sort((a, b) => {
+    if (b.score !== a.score) {
+      return b.score - a.score;
+    }
+
+    return a.name.localeCompare(b.name);
+  });
+
+  return leaderboard;
+}
+
+wss.on('connection', (ws, req) => {
   const params = new URL(
     req.url,
     'http://localhost'
@@ -86,7 +101,6 @@ w.on('connection', (ws, req) => {
     return;
   }
 
-  // CREATE ROOM
   if (!rooms.has(roomCode)) {
     rooms.set(roomCode, {
       players: new Map(),
@@ -102,13 +116,15 @@ w.on('connection', (ws, req) => {
 
   const room = rooms.get(roomCode);
 
-  // HOST
+  // HOST CONNECTION
   if (id === 'HOST') {
     room.host = ws;
     ws.host = true;
+
+    send(ws, getState(room));
   }
 
-  // PLAYER
+  // PLAYER CONNECTION
   else {
     room.players.set(id, {
       ws: ws,
@@ -118,12 +134,11 @@ w.on('connection', (ws, req) => {
     if (!room.scores.has(id)) {
       room.scores.set(id, 0);
     }
+
+    send(ws, getState(room));
+    broadcast(room, getState(room));
   }
 
-  send(ws, getState(room));
-  broadcast(room, getState(room));
-
-  // MESSAGES
   ws.on('message', data => {
     let message;
 
@@ -170,7 +185,6 @@ w.on('connection', (ws, req) => {
         });
 
         room.timer = setInterval(() => {
-
           room.left--;
 
           broadcast(room, {
@@ -178,9 +192,10 @@ w.on('connection', (ws, req) => {
             seconds: room.left
           });
 
-          // TIMER REACHES ZERO
+          // IMPORTANT:
+          // Timer continues even after players answer.
+          // Question locks ONLY when timer reaches 0.
           if (room.left <= 0) {
-
             clearInterval(room.timer);
 
             room.lock = true;
@@ -201,18 +216,10 @@ w.on('connection', (ws, req) => {
       // LEADERBOARD
       if (message.type === 'leaderboard') {
 
-        const leaderboard = [...room.players].map(
-          ([playerId, player]) => ({
-            name: player.name,
-            score: room.scores.get(playerId) || 0
-          })
-        );
+        const leaderboard = getLeaderboard(room);
 
-        leaderboard.sort(
-          (a, b) => b.score - a.score
-        );
-
-        send(ws, {
+        // SEND TO EVERYONE
+        broadcast(room, {
           type: 'leaderboard',
           items: leaderboard
         });
@@ -229,7 +236,6 @@ w.on('connection', (ws, req) => {
       !room.answers.has(id)
     ) {
 
-      // SAVE ANSWER
       room.answers.set(id, message.answer);
 
       const question = Q[room.i];
@@ -242,6 +248,8 @@ w.on('connection', (ws, req) => {
         message.answer === question.answer;
 
       // FIXED SCORING
+      // Correct = 100
+      // Wrong = 0
       const points = correct ? 100 : 0;
 
       const currentScore =
@@ -252,7 +260,6 @@ w.on('connection', (ws, req) => {
 
       room.scores.set(id, newScore);
 
-      // SEND RESULT ONLY TO PLAYER
       send(ws, {
         type: 'result',
         correct: correct,
@@ -260,17 +267,12 @@ w.on('connection', (ws, req) => {
         score: newScore
       });
 
-      /*
-       IMPORTANT:
-       DO NOT STOP THE TIMER HERE.
-
-       The timer continues until the
-       configured question time expires.
-      */
+      // IMPORTANT:
+      // DO NOT STOP THE TIMER HERE.
+      // Timer continues until it reaches 0.
     }
   });
 
-  // CONNECTION CLOSED
   ws.on('close', () => {
 
     if (ws.host) {
@@ -287,9 +289,6 @@ w.on('connection', (ws, req) => {
   });
 });
 
-// START SERVER
-s.listen(port, () => {
-  console.log(
-    'DQC quiz on ' + port
-  );
+server.listen(port, () => {
+  console.log('DQC quiz on ' + port);
 });
