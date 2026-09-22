@@ -1,5 +1,477 @@
 <!doctype html>
-<html>
+<html lang="en">
+
 <head>
-<meta charset="UTF-8">
-  <meta name=viewport content="width=device-width,initial-scale=1"><title>DQC Live Quiz</title><link rel=stylesheet href=style.css><main class=shell><h1>🧪 DQC LIVE QUIZ</h1><section id=join class=card><h2>Join Game</h2><input id=name placeholder="Enter your name"><input id=room placeholder="Enter room code"><button onclick=join()>Join Quiz</button></section><section id=lobby class="card hidden"><h2>You're in! 🎉</h2><p id=welcome></p><p>Waiting for host…</p></section><section id=game class="card hidden"><div id=round></div><div id=timer class=timer>--</div><h2 id=q></h2><div id=opts></div><p id=status></p><b id=score></b></section><section id=end class="card hidden"><h2>🏆 Final Leaderboard</h2><div id=final></div></section></main><script>const qrRoom=new URLSearchParams(location.search).get("room");if(qrRoom){document.getElementById("room").value=qrRoom;}</script><script src=app.js></script>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>DQC Live Quiz</title>
+
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    .join-container {
+      width: min(600px, 92%);
+      margin: 0 auto;
+      padding: 50px 0;
+    }
+
+    .join-card {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 25px;
+      padding: 30px;
+      backdrop-filter: blur(10px);
+    }
+
+    .join-title {
+      text-align: center;
+      font-size: 38px;
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
+
+    .join-subtitle {
+      text-align: center;
+      opacity: 0.7;
+      margin-bottom: 30px;
+    }
+
+    .field-label {
+      display: block;
+      margin: 15px 0 7px;
+      font-weight: 700;
+    }
+
+    .join-input {
+      width: 100%;
+      padding: 15px;
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 12px;
+      background: rgba(0,0,0,0.2);
+      color: white;
+      font-size: 17px;
+      outline: none;
+    }
+
+    .join-input::placeholder {
+      color: rgba(255,255,255,0.5);
+    }
+
+    .join-button {
+      width: 100%;
+      margin-top: 25px;
+      padding: 16px;
+      border: 0;
+      border-radius: 13px;
+      background: white;
+      color: #111;
+      font-size: 18px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .join-button:disabled {
+      opacity: 0.6;
+    }
+
+    .error-message {
+      display: none;
+      margin-top: 15px;
+      padding: 12px;
+      border-radius: 10px;
+      background: rgba(255,70,70,0.15);
+      color: #ffb3b3;
+      text-align: center;
+    }
+
+    .quiz-container {
+      display: none;
+      width: min(850px, 94%);
+      margin: 0 auto;
+      padding: 25px 0 50px;
+    }
+
+    .quiz-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .quiz-info {
+      padding: 8px 14px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.08);
+    }
+
+    .question-card {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 25px;
+      padding: 28px;
+    }
+
+    #question {
+      font-size: 26px;
+      font-weight: 750;
+      line-height: 1.35;
+      margin: 20px 0;
+    }
+
+    #timer {
+      text-align: center;
+      font-size: 42px;
+      font-weight: 800;
+      margin: 20px 0;
+    }
+
+    #timer.danger {
+      animation: pulse 0.7s infinite alternate;
+    }
+
+    @keyframes pulse {
+      from {
+        transform: scale(1);
+      }
+      to {
+        transform: scale(1.08);
+      }
+    }
+
+    .answer-button {
+      width: 100%;
+      padding: 16px;
+      margin: 8px 0;
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 13px;
+      background: rgba(255,255,255,0.08);
+      color: white;
+      text-align: left;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .answer-button:hover {
+      background: rgba(255,255,255,0.15);
+    }
+
+    .answer-button:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    .result {
+      display: none;
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 12px;
+      text-align: center;
+      font-size: 18px;
+      font-weight: 750;
+    }
+
+    .result.correct {
+      background: rgba(50,200,100,0.18);
+    }
+
+    .result.wrong {
+      background: rgba(255,70,70,0.18);
+    }
+
+    .leaderboard-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 15px;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(8px);
+    }
+
+    .leaderboard-card {
+      width: min(700px, 100%);
+      max-height: 90vh;
+      overflow: hidden;
+      background: #142033;
+      border-radius: 22px;
+      box-shadow: 0 25px 70px rgba(0,0,0,0.5);
+    }
+
+    .leaderboard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.12);
+    }
+
+    .leaderboard-title {
+      font-size: 23px;
+      font-weight: 800;
+    }
+
+    .leaderboard-subtitle {
+      font-size: 13px;
+      opacity: 0.6;
+      margin-top: 4px;
+    }
+
+    .leaderboard-close {
+      width: 40px;
+      height: 40px;
+      border: 0;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.1);
+      color: white;
+      font-size: 18px;
+    }
+
+    .leaderboard-columns,
+    .leaderboard-row {
+      display: grid;
+      grid-template-columns: 65px 1fr 90px;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .leaderboard-columns {
+      padding: 12px 20px;
+      font-size: 10px;
+      opacity: 0.55;
+    }
+
+    .leaderboard-list {
+      max-height: 65vh;
+      overflow-y: auto;
+      padding: 0 12px 15px;
+    }
+
+    .leaderboard-row {
+      min-height: 55px;
+      margin: 6px 0;
+      padding: 7px 10px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.06);
+    }
+
+    .leaderboard-row.top-player {
+      background: rgba(255,255,255,0.11);
+    }
+
+    .rank {
+      text-align: center;
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    .player-name {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .player-score {
+      text-align: right;
+      font-weight: 800;
+      font-size: 18px;
+    }
+
+    .you-label {
+      margin-left: 5px;
+      padding: 2px 6px;
+      border-radius: 10px;
+      font-size: 9px;
+      background: rgba(255,255,255,0.15);
+    }
+
+    @media (max-width: 600px) {
+      .join-title {
+        font-size: 30px;
+      }
+
+      #question {
+        font-size: 21px;
+      }
+
+      #timer {
+        font-size: 36px;
+      }
+    }
+  </style>
+</head>
+
+
+<body>
+
+  <!-- =========================
+       JOIN SCREEN
+       ========================= -->
+
+  <div
+    id="joinScreen"
+    class="join-container">
+
+    <div class="join-card">
+
+      <div class="join-title">
+        🧪 DQC LIVE QUIZ
+      </div>
+
+      <div class="join-subtitle">
+        Enter your name and join the game
+      </div>
+
+
+      <label
+        class="field-label"
+        for="name">
+        Your Name
+      </label>
+
+      <input
+        id="name"
+        class="join-input"
+        type="text"
+        placeholder="Enter your name"
+        autocomplete="name"
+        maxlength="30"
+      >
+
+
+      <label
+        class="field-label"
+        for="room">
+        Room Code
+      </label>
+
+      <input
+        id="room"
+        class="join-input"
+        type="text"
+        placeholder="Enter room code"
+        maxlength="10"
+        autocomplete="off"
+      >
+
+
+      <button
+        id="joinButton"
+        class="join-button"
+        type="button">
+        🚀 Join Quiz
+      </button>
+
+      <div
+        id="joinError"
+        class="error-message">
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =========================
+       QUIZ SCREEN
+       ========================= -->
+
+  <div
+    id="quizScreen"
+    class="quiz-container">
+
+    <div class="quiz-top">
+
+      <div class="quiz-info">
+        👤
+        <span id="playerName">Player</span>
+      </div>
+
+      <div class="quiz-info">
+        Room:
+        <span id="roomDisplay">---</span>
+      </div>
+
+      <div class="quiz-info">
+        Score:
+        <span id="score">0</span>
+      </div>
+
+    </div>
+
+
+    <div class="question-card">
+
+      <div id="round">
+        Waiting for host...
+      </div>
+
+      <div id="question">
+        The quiz will begin shortly.
+      </div>
+
+      <div id="timer">
+        —
+      </div>
+
+      <div id="options"></div>
+
+      <div
+        id="result"
+        class="result">
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <script src="app.js"></script>
+
+
+  <!-- =========================
+       QR ROOM AUTO-FILL
+       ========================= -->
+
+  <script>
+
+    const qrRoom =
+      new URLSearchParams(
+        window.location.search
+      ).get('room');
+
+    if (qrRoom) {
+
+      const roomInput =
+        document.getElementById('room');
+
+      if (roomInput) {
+
+        roomInput.value =
+          qrRoom.toUpperCase();
+
+        // Keep the room code visible,
+        // but player only needs to enter name.
+        roomInput.style.display = 'none';
+
+        const label =
+          roomInput.previousElementSibling;
+
+        if (label) {
+          label.style.display = 'none';
+        }
+      }
+    }
+
+  </script>
+
+</body>
+
+</html>
