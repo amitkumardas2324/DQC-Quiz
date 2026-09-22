@@ -1,4 +1,413 @@
 <!doctype html>
-<html>
+<html lang="en">
+
 <head>
-<meta charset="UTF-8"><meta name=viewport content="width=device-width,initial-scale=1"><title>DQC Host</title><link rel=stylesheet href=style.css><main class=shell><h1>🎤 DQC HOST</h1><section class=card><button onclick=createRoom()>Create Room</button><h2 id=room></h2><p>Show this QR to players:</p><img id=qr class="qr hidden"><p id=joinurl></p></section><section class=card><h2>Players (<span id=count>0</span>)</h2><div id=players></div></section><section class=card><h2 id=title>Ready</h2><p id=hq></p><div class=timer id=htimer>--</div><button onclick=prev()>← Previous</button><button onclick=next()>▶ Next / Start</button><button onclick=pause()>⏸ Pause</button><button onclick=board()>🏆 Leaderboard</button><div id=answers></div></section></main><script src=host.js></script>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>DQC Host</title>
+
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    body {
+      font-family:
+        system-ui,
+        "Noto Color Emoji",
+        "Segoe UI Emoji",
+        "Apple Color Emoji",
+        sans-serif;
+    }
+
+    .host-container {
+      width: min(1100px, 94%);
+      margin: 0 auto;
+      padding: 35px 0 60px;
+    }
+
+    .host-title {
+      text-align: center;
+      font-size: 48px;
+      font-weight: 800;
+      margin: 20px 0 35px;
+    }
+
+    .host-card {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 28px;
+      padding: 32px;
+      margin-bottom: 24px;
+      backdrop-filter: blur(10px);
+    }
+
+    .create-button {
+      padding: 16px 28px;
+      border: 0;
+      border-radius: 14px;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      background: white;
+      color: #111;
+    }
+
+    .create-button:hover {
+      transform: translateY(-1px);
+    }
+
+    .room-code {
+      font-size: 36px;
+      font-weight: 800;
+      margin: 25px 0 10px;
+    }
+
+    .join-text {
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+
+    .join-url {
+      font-size: 16px;
+      word-break: break-all;
+      opacity: 0.9;
+      margin-bottom: 25px;
+    }
+
+    /* QR CODE */
+
+    .qr-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 20px;
+      min-height: 330px;
+    }
+
+    #qr {
+      width: 300px;
+      height: 300px;
+      object-fit: contain;
+      background: white;
+      padding: 12px;
+      border-radius: 18px;
+      display: block;
+    }
+
+    .qr-loading {
+      text-align: center;
+      opacity: 0.7;
+    }
+
+    .players-title {
+      font-size: 28px;
+      font-weight: 750;
+      margin-bottom: 15px;
+    }
+
+    #players {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    #players li {
+      padding: 12px 15px;
+      margin: 7px 0;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.08);
+      font-size: 17px;
+    }
+
+    .ready-title {
+      font-size: 28px;
+      font-weight: 750;
+      margin-bottom: 15px;
+    }
+
+    .question-area {
+      margin-top: 20px;
+    }
+
+    #round {
+      font-size: 17px;
+      opacity: 0.7;
+    }
+
+    #question {
+      font-size: 27px;
+      font-weight: 700;
+      margin: 15px 0;
+    }
+
+    #timer {
+      font-size: 40px;
+      font-weight: 800;
+      text-align: center;
+      margin: 20px 0;
+    }
+
+    #timer.locked {
+      opacity: 0.7;
+    }
+
+    .host-option {
+      padding: 13px 16px;
+      margin: 8px 0;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.08);
+      font-size: 17px;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 25px;
+    }
+
+    .controls button {
+      padding: 14px 20px;
+      border: 0;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .controls button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .status {
+      margin-top: 15px;
+      opacity: 0.75;
+    }
+
+    @media (max-width: 600px) {
+
+      .host-title {
+        font-size: 34px;
+      }
+
+      .host-card {
+        padding: 22px;
+      }
+
+      .room-code {
+        font-size: 30px;
+      }
+
+      #qr {
+        width: 260px;
+        height: 260px;
+      }
+
+      #question {
+        font-size: 22px;
+      }
+    }
+  </style>
+</head>
+
+
+<body>
+
+  <div class="host-container">
+
+    <!-- TITLE -->
+
+    <div class="host-title">
+      🎤 DQC HOST
+    </div>
+
+
+    <!-- ROOM / QR -->
+
+    <div class="host-card">
+
+      <button
+        id="create"
+        class="create-button">
+        Create Room
+      </button>
+
+      <div
+        id="room"
+        class="room-code">
+        Room: —
+      </div>
+
+      <div class="join-text">
+        Show this QR to players:
+      </div>
+
+      <div
+        id="joinurl"
+        class="join-url">
+        Create a room to generate the QR code.
+      </div>
+
+
+      <!-- QR CODE -->
+
+      <div class="qr-container">
+
+        <div
+          id="qrLoading"
+          class="qr-loading">
+          QR code will appear here
+        </div>
+
+        <img
+          id="qr"
+          src=""
+          alt="Scan to join DQC Quiz"
+          style="display:none;"
+        >
+
+      </div>
+
+    </div>
+
+
+    <!-- PLAYERS -->
+
+    <div class="host-card">
+
+      <div class="players-title">
+        Players (<span id="count">0</span>)
+      </div>
+
+      <ul id="players"></ul>
+
+    </div>
+
+
+    <!-- QUIZ CONTROL -->
+
+    <div class="host-card">
+
+      <div class="ready-title">
+        Ready
+      </div>
+
+      <div class="question-area">
+
+        <div id="round">
+          —
+        </div>
+
+        <div id="question">
+          Create a room and start the quiz.
+        </div>
+
+        <div id="options"></div>
+
+        <div id="timer">
+          —
+        </div>
+
+      </div>
+
+
+      <!-- CONTROLS -->
+
+      <div class="controls">
+
+        <button
+          id="prev"
+          disabled>
+          ◀ Previous
+        </button>
+
+        <button
+          id="next"
+          disabled>
+          ▶ Next / Start
+        </button>
+
+        <button
+          id="pause"
+          disabled>
+          ⏸ Pause
+        </button>
+
+        <button
+          id="board"
+          disabled>
+          🏆 Leaderboard
+        </button>
+
+      </div>
+
+
+      <div
+        id="status"
+        class="status">
+        Ready
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- HOST JAVASCRIPT -->
+
+  <script src="host.js"></script>
+
+
+  <!-- QR DISPLAY HELPER -->
+
+  <script>
+
+    /*
+      This watches for the QR URL generated
+      by host.js and makes the QR visible.
+    */
+
+    const qrObserver =
+      new MutationObserver(() => {
+
+        const qr =
+          document.getElementById('qr');
+
+        const loading =
+          document.getElementById('qrLoading');
+
+        if (
+          qr &&
+          qr.src &&
+          qr.src !== window.location.href
+        ) {
+
+          qr.style.display = 'block';
+
+          if (loading) {
+            loading.style.display = 'none';
+          }
+        }
+
+      });
+
+
+    qrObserver.observe(
+      document.body,
+      {
+        attributes: true,
+        subtree: true,
+        attributeFilter: ['src', 'style']
+      }
+    );
+
+  </script>
+
+</body>
+
+</html>
