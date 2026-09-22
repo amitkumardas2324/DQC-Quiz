@@ -11,7 +11,7 @@ const Q = JSON.parse(
 const rooms = new Map();
 const port = process.env.PORT || 3000;
 
-// HTTP server
+// HTTP SERVER
 const s = http.createServer((req, res) => {
   let p = url.parse(req.url).pathname;
 
@@ -21,7 +21,9 @@ const s = http.createServer((req, res) => {
   const f = path.join(__dirname, p);
 
   if (!fs.existsSync(f)) {
-    res.writeHead(404, { 'Content-Type': 'text/plain' });
+    res.writeHead(404, {
+      'Content-Type': 'text/plain'
+    });
     return res.end('Not found');
   }
 
@@ -42,7 +44,7 @@ const s = http.createServer((req, res) => {
   res.end(fs.readFileSync(f));
 });
 
-// WebSocket server
+// WEBSOCKET SERVER
 const w = new WebSocket.Server({
   server: s,
   path: '/ws'
@@ -68,7 +70,7 @@ const getState = (room) => ({
   names: [...room.players.values()].map(player => player.name)
 });
 
-// WebSocket connection
+// CONNECTION
 w.on('connection', (ws, req) => {
   const params = new URL(
     req.url,
@@ -84,7 +86,7 @@ w.on('connection', (ws, req) => {
     return;
   }
 
-  // Create room if it doesn't exist
+  // CREATE ROOM
   if (!rooms.has(roomCode)) {
     rooms.set(roomCode, {
       players: new Map(),
@@ -100,13 +102,13 @@ w.on('connection', (ws, req) => {
 
   const room = rooms.get(roomCode);
 
-  // Host connection
+  // HOST
   if (id === 'HOST') {
     room.host = ws;
     ws.host = true;
   }
 
-  // Player connection
+  // PLAYER
   else {
     room.players.set(id, {
       ws: ws,
@@ -121,7 +123,7 @@ w.on('connection', (ws, req) => {
   send(ws, getState(room));
   broadcast(room, getState(room));
 
-  // Messages
+  // MESSAGES
   ws.on('message', data => {
     let message;
 
@@ -131,10 +133,13 @@ w.on('connection', (ws, req) => {
       return;
     }
 
+    // =========================
     // HOST CONTROLS
+    // =========================
+
     if (ws.host) {
 
-      // Start / next question
+      // START / NEXT QUESTION
       if (message.type === 'start') {
         clearInterval(room.timer);
 
@@ -165,6 +170,7 @@ w.on('connection', (ws, req) => {
         });
 
         room.timer = setInterval(() => {
+
           room.left--;
 
           broadcast(room, {
@@ -172,7 +178,9 @@ w.on('connection', (ws, req) => {
             seconds: room.left
           });
 
+          // TIMER REACHES ZERO
           if (room.left <= 0) {
+
             clearInterval(room.timer);
 
             room.lock = true;
@@ -181,16 +189,18 @@ w.on('connection', (ws, req) => {
               type: 'locked'
             });
           }
+
         }, 1000);
       }
 
-      // Pause timer
+      // PAUSE
       if (message.type === 'pause') {
         clearInterval(room.timer);
       }
 
-      // Leaderboard
+      // LEADERBOARD
       if (message.type === 'leaderboard') {
+
         const leaderboard = [...room.players].map(
           ([playerId, player]) => ({
             name: player.name,
@@ -198,7 +208,9 @@ w.on('connection', (ws, req) => {
           })
         );
 
-        leaderboard.sort((a, b) => b.score - a.score);
+        leaderboard.sort(
+          (a, b) => b.score - a.score
+        );
 
         send(ws, {
           type: 'leaderboard',
@@ -207,12 +219,17 @@ w.on('connection', (ws, req) => {
       }
     }
 
+    // =========================
     // PLAYER ANSWER
+    // =========================
+
     else if (
       message.type === 'answer' &&
       !room.lock &&
       !room.answers.has(id)
     ) {
+
+      // SAVE ANSWER
       room.answers.set(id, message.answer);
 
       const question = Q[room.i];
@@ -221,18 +238,21 @@ w.on('connection', (ws, req) => {
         return;
       }
 
-      const correct = message.answer === question.answer;
+      const correct =
+        message.answer === question.answer;
 
-      // FIXED SCORING:
-      // Correct answer = 100 points
-      // Wrong answer = 0 points
+      // FIXED SCORING
       const points = correct ? 100 : 0;
 
-      const currentScore = room.scores.get(id) || 0;
-      const newScore = currentScore + points;
+      const currentScore =
+        room.scores.get(id) || 0;
+
+      const newScore =
+        currentScore + points;
 
       room.scores.set(id, newScore);
 
+      // SEND RESULT ONLY TO PLAYER
       send(ws, {
         type: 'result',
         correct: correct,
@@ -240,34 +260,36 @@ w.on('connection', (ws, req) => {
         score: newScore
       });
 
-      // Lock question when everyone has answered
-      if (
-        room.answers.size === room.players.size &&
-        room.players.size > 0
-      ) {
-        clearInterval(room.timer);
+      /*
+       IMPORTANT:
+       DO NOT STOP THE TIMER HERE.
 
-        room.lock = true;
-
-        broadcast(room, {
-          type: 'locked'
-        });
-      }
+       The timer continues until the
+       configured question time expires.
+      */
     }
   });
 
-  // Connection closed
+  // CONNECTION CLOSED
   ws.on('close', () => {
+
     if (ws.host) {
       room.host = null;
     } else {
+
       room.players.delete(id);
-      broadcast(room, getState(room));
+
+      broadcast(
+        room,
+        getState(room)
+      );
     }
   });
 });
 
-// Start server
+// START SERVER
 s.listen(port, () => {
-  console.log('DQC quiz on ' + port);
+  console.log(
+    'DQC quiz on ' + port
+  );
 });
