@@ -36,9 +36,23 @@ function createRoom() {
   const qrElement = $('qr');
 
   if (qrElement) {
-    qrElement.src = qrUrl;
+  qrElement.onload = () => {
     qrElement.style.display = 'block';
-  }
+
+    const loading =
+      document.getElementById('qrLoading');
+
+    if (loading) {
+      loading.style.display = 'none';
+    }
+  };
+
+  qrElement.onerror = () => {
+    console.error('QR code failed to load');
+  };
+
+  qrElement.src = qrUrl;
+}
 
   // Connect host
   connectHost();
