@@ -7,42 +7,71 @@ const $ = id =>
   document.getElementById(id);
 
 
-// =========================
+// ==============================
 // JOIN QUIZ
-// =========================
+// ==============================
 
 function joinQuiz() {
 
+  const nameInput = $('name');
+  const roomInput = $('room');
+  const errorBox = $('joinError');
+
   playerName =
-    $('name').value.trim();
+    nameInput.value.trim();
 
   room =
-    $('room').value.trim().toUpperCase();
+    roomInput.value.trim().toUpperCase();
+
+
+  // Validate name
 
   if (!playerName) {
-    alert('Please enter your name.');
+
+    showJoinError(
+      'Please enter your name.'
+    );
+
+    nameInput.focus();
+
     return;
   }
 
+
+  // Validate room
+
   if (!room) {
-    alert('Please enter the room code.');
+
+    showJoinError(
+      'Please enter the room code.'
+    );
+
+    roomInput.focus();
+
     return;
   }
+
+
+  // Generate unique player ID
 
   playerId =
     Math.random()
       .toString(36)
-      .slice(2, 10);
+      .substring(2, 10);
+
+
+  // WebSocket protocol
 
   const protocol =
-    location.protocol === 'https:'
+    window.location.protocol === 'https:'
       ? 'wss:'
       : 'ws:';
+
 
   const wsUrl =
     protocol +
     '//' +
-    location.host +
+    window.location.host +
     '/ws?room=' +
     encodeURIComponent(room) +
     '&id=' +
@@ -50,51 +79,202 @@ function joinQuiz() {
     '&name=' +
     encodeURIComponent(playerName);
 
-  ws = new WebSocket(wsUrl);
+
+  console.log(
+    'Connecting to:',
+    wsUrl
+  );
+
+
+  try {
+
+    ws =
+      new WebSocket(wsUrl);
+
+  } catch (error) {
+
+    console.error(error);
+
+    showJoinError(
+      'Unable to connect. Please refresh and try again.'
+    );
+
+    return;
+  }
+
+
+  // Disable button while connecting
+
+  const joinButton =
+    $('joinButton');
+
+  if (joinButton) {
+
+    joinButton.disabled =
+      true;
+
+    joinButton.textContent =
+      'Connecting...';
+  }
+
+
+  // Connected
 
   ws.onopen = () => {
 
-    $('joinScreen').style.display =
-      'none';
+    console.log(
+      'Connected to quiz server'
+    );
 
-    $('quizScreen').style.display =
-      'block';
+    hideJoinError();
+
+    const joinScreen =
+      $('joinScreen');
+
+    const quizScreen =
+      $('quizScreen');
+
+
+    if (joinScreen) {
+      joinScreen.style.display =
+        'none';
+    }
+
+    if (quizScreen) {
+      quizScreen.style.display =
+        'block';
+    }
+
 
     if ($('playerName')) {
+
       $('playerName').textContent =
         playerName;
     }
 
+
     if ($('roomDisplay')) {
+
       $('roomDisplay').textContent =
         room;
     }
   };
 
+
+  // Server error
+
+  ws.onerror = error => {
+
+    console.error(
+      'WebSocket error:',
+      error
+    );
+
+    showJoinError(
+      'Could not connect to the quiz. Please try again.'
+    );
+
+    resetJoinButton();
+  };
+
+
+  // Connection closed
+
   ws.onclose = () => {
 
-    alert(
-      'Connection closed. Please refresh and join again.'
+    console.log(
+      'WebSocket disconnected'
     );
+
+    resetJoinButton();
   };
+
+
+  // Messages
 
   ws.onmessage = event => {
 
-    const message =
-      JSON.parse(event.data);
+    let message;
+
+    try {
+
+      message =
+        JSON.parse(event.data);
+
+    } catch (error) {
+
+      console.error(
+        'Invalid server message:',
+        event.data
+      );
+
+      return;
+    }
 
     handleMessage(message);
   };
 }
 
 
-// =========================
+// ==============================
+// ERROR DISPLAY
+// ==============================
+
+function showJoinError(message) {
+
+  const errorBox =
+    $('joinError');
+
+  if (!errorBox) {
+    alert(message);
+    return;
+  }
+
+  errorBox.textContent =
+    message;
+
+  errorBox.style.display =
+    'block';
+}
+
+
+function hideJoinError() {
+
+  const errorBox =
+    $('joinError');
+
+  if (errorBox) {
+    errorBox.style.display =
+      'none';
+  }
+}
+
+
+function resetJoinButton() {
+
+  const button =
+    $('joinButton');
+
+  if (button) {
+
+    button.disabled =
+      false;
+
+    button.textContent =
+      '🚀 Join Quiz';
+  }
+}
+
+
+// ==============================
 // SERVER MESSAGES
-// =========================
+// ==============================
 
 function handleMessage(message) {
 
-  // PARTICIPANT STATE
+
+  // Player state
+
   if (message.type === 'state') {
 
     if ($('participantCount')) {
@@ -102,70 +282,108 @@ function handleMessage(message) {
       $('participantCount').textContent =
         message.players;
     }
+
+    return;
   }
 
 
-  // NEW QUESTION
+  // New question
+
   if (message.type === 'question') {
 
     closeLeaderboard();
 
     showQuestion(message);
+
+    return;
   }
 
 
-  // TIMER
+  // Timer
+
   if (message.type === 'tick') {
 
     updateTimer(
       message.seconds
     );
+
+    return;
   }
 
 
-  // QUESTION LOCKED
+  // Locked
+
   if (message.type === 'locked') {
 
     lockQuestion();
 
     updateTimer(0);
+
+    return;
   }
 
 
-  // ANSWER RESULT
+  // Answer result
+
   if (message.type === 'result') {
 
     showResult(message);
+
+    return;
   }
 
 
-  // LEADERBOARD
+  // Leaderboard
+
   if (message.type === 'leaderboard') {
 
     showLeaderboard(
       message.items
     );
+
+    return;
   }
 }
 
 
-// =========================
+// ==============================
 // SHOW QUESTION
-// =========================
+// ==============================
 
 function showQuestion(message) {
 
-  if ($('question')) {
+  const question =
+    $('question');
 
-    $('question').textContent =
+  if (question) {
+
+    question.textContent =
       message.question;
   }
 
-  if ($('round')) {
 
-    $('round').textContent =
-      'Round ' + message.round;
+  const round =
+    $('round');
+
+  if (round) {
+
+    round.textContent =
+      'Round ' +
+      message.round;
   }
+
+
+  const result =
+    $('result');
+
+  if (result) {
+
+    result.style.display =
+      'none';
+
+    result.textContent = '';
+  }
+
 
   const options =
     $('options');
@@ -176,6 +394,7 @@ function showQuestion(message) {
 
   options.innerHTML = '';
 
+
   message.options.forEach(
     (option, index) => {
 
@@ -183,6 +402,9 @@ function showQuestion(message) {
         document.createElement(
           'button'
         );
+
+      button.type =
+        'button';
 
       button.className =
         'answer-button';
@@ -196,9 +418,7 @@ function showQuestion(message) {
 
       button.onclick = () => {
 
-        submitAnswer(
-          index
-        );
+        submitAnswer(index);
       };
 
       options.appendChild(
@@ -209,9 +429,9 @@ function showQuestion(message) {
 }
 
 
-// =========================
+// ==============================
 // SUBMIT ANSWER
-// =========================
+// ==============================
 
 function submitAnswer(answer) {
 
@@ -223,25 +443,32 @@ function submitAnswer(answer) {
     return;
   }
 
+
   const buttons =
     document.querySelectorAll(
       '.answer-button'
     );
 
+
   buttons.forEach(button => {
-    button.disabled = true;
+
+    button.disabled =
+      true;
   });
 
-  ws.send(JSON.stringify({
-    type: 'answer',
-    answer: answer
-  }));
+
+  ws.send(
+    JSON.stringify({
+      type: 'answer',
+      answer: answer
+    })
+  );
 }
 
 
-// =========================
+// ==============================
 // TIMER
-// =========================
+// ==============================
 
 function updateTimer(seconds) {
 
@@ -254,6 +481,7 @@ function updateTimer(seconds) {
 
   timer.textContent =
     seconds;
+
 
   if (seconds <= 5) {
 
@@ -270,9 +498,9 @@ function updateTimer(seconds) {
 }
 
 
-// =========================
+// ==============================
 // LOCK QUESTION
-// =========================
+// ==============================
 
 function lockQuestion() {
 
@@ -281,15 +509,18 @@ function lockQuestion() {
       '.answer-button'
     );
 
+
   buttons.forEach(button => {
-    button.disabled = true;
+
+    button.disabled =
+      true;
   });
 }
 
 
-// =========================
-// ANSWER RESULT
-// =========================
+// ==============================
+// RESULT
+// ==============================
 
 function showResult(message) {
 
@@ -299,6 +530,7 @@ function showResult(message) {
   if (!result) {
     return;
   }
+
 
   if (message.correct) {
 
@@ -317,8 +549,10 @@ function showResult(message) {
       'result wrong';
   }
 
+
   result.style.display =
     'block';
+
 
   if ($('score')) {
 
@@ -328,13 +562,14 @@ function showResult(message) {
 }
 
 
-// =========================
+// ==============================
 // LEADERBOARD
-// =========================
+// ==============================
 
 function showLeaderboard(items) {
 
   closeLeaderboard();
+
 
   const overlay =
     document.createElement(
@@ -347,7 +582,9 @@ function showLeaderboard(items) {
   overlay.className =
     'leaderboard-overlay';
 
+
   let rows = '';
+
 
   items.forEach(
     (player, index) => {
@@ -355,29 +592,35 @@ function showLeaderboard(items) {
       const position =
         index + 1;
 
-      let medal = '';
+      let medal;
+
 
       if (position === 1) {
+
         medal = '🥇';
+
       } else if (position === 2) {
+
         medal = '🥈';
+
       } else if (position === 3) {
+
         medal = '🥉';
+
       } else {
+
         medal = position;
       }
 
+
       const isMe =
         player.id === playerId;
+
 
       rows += `
         <div class="leaderboard-row ${
           position <= 3
             ? 'top-player'
-            : ''
-        } ${
-          isMe
-            ? 'my-position'
             : ''
         }">
 
@@ -387,6 +630,7 @@ function showLeaderboard(items) {
 
           <div class="player-name">
             ${escapeHtml(player.name)}
+
             ${
               isMe
                 ? '<span class="you-label">YOU</span>'
@@ -403,14 +647,20 @@ function showLeaderboard(items) {
     }
   );
 
-  if (items.length === 0) {
+
+  if (!items.length) {
 
     rows = `
-      <div class="empty-board">
+      <div style="
+        padding:30px;
+        text-align:center;
+        opacity:.6;
+      ">
         No participants yet
       </div>
     `;
   }
+
 
   overlay.innerHTML = `
     <div class="leaderboard-card">
@@ -418,41 +668,67 @@ function showLeaderboard(items) {
       <div class="leaderboard-header">
 
         <div>
+
           <div class="leaderboard-title">
-            🏆 LEADERBOARD
+            🏆 LIVE LEADERBOARD
           </div>
 
           <div class="leaderboard-subtitle">
             Current scores
           </div>
+
         </div>
 
         <button
           class="leaderboard-close"
-          onclick="closeLeaderboard()">
+          type="button">
           ✕
         </button>
 
       </div>
 
+
       <div class="leaderboard-columns">
+
         <div>RANK</div>
         <div>PARTICIPANT</div>
         <div>SCORE</div>
+
       </div>
 
+
       <div class="leaderboard-list">
+
         ${rows}
+
       </div>
 
     </div>
   `;
 
+
   document.body.appendChild(
     overlay
   );
+
+
+  const closeButton =
+    overlay.querySelector(
+      '.leaderboard-close'
+    );
+
+
+  if (closeButton) {
+
+    closeButton.onclick =
+      closeLeaderboard;
+  }
 }
 
+
+// ==============================
+// CLOSE LEADERBOARD
+// ==============================
 
 function closeLeaderboard() {
 
@@ -467,9 +743,9 @@ function closeLeaderboard() {
 }
 
 
-// =========================
-// SECURITY
-// =========================
+// ==============================
+// HTML ESCAPE
+// ==============================
 
 function escapeHtml(value) {
 
@@ -482,18 +758,67 @@ function escapeHtml(value) {
 }
 
 
-// =========================
-// BUTTON
-// =========================
+// ==============================
+// JOIN BUTTON
+// ==============================
 
 document.addEventListener(
   'DOMContentLoaded',
   () => {
 
-    if ($('joinButton')) {
+    const joinButton =
+      $('joinButton');
 
-      $('joinButton').onclick =
-        joinQuiz;
+
+    if (joinButton) {
+
+      joinButton.addEventListener(
+        'click',
+        joinQuiz
+      );
+    }
+
+
+    // Also allow ENTER key
+
+    const nameInput =
+      $('name');
+
+    const roomInput =
+      $('room');
+
+
+    if (nameInput) {
+
+      nameInput.addEventListener(
+        'keydown',
+        event => {
+
+          if (
+            event.key === 'Enter'
+          ) {
+            joinQuiz();
+          }
+
+        }
+      );
+    }
+
+
+    if (roomInput) {
+
+      roomInput.addEventListener(
+        'keydown',
+        event => {
+
+          if (
+            event.key === 'Enter'
+          ) {
+            joinQuiz();
+          }
+
+        }
+      );
     }
   }
 );
